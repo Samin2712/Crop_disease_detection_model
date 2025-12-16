@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plant Disease Detection</title>
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Cropper.js -->
+  <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Plant Disease Detection</h1>
+    <p class="sub">Select crop → Upload → Crop the leaf → Predict</p>
+
+    <div class="card">
+
+      <!-- ✅ NEW: Crop selector -->
+      <div class="row">
+        <label class="label2">Select Crop</label>
+        <select id="cropSelect" class="select">
+          <option value="rice">Rice</option>
+          <option value="jute">Jute</option>
+          <option value="potato">Potato</option>
+          <option value="tomato">Tomato</option>
+        </select>
+      </div>
+
+      <input id="file" type="file" accept="image/*" />
+
+      <div class="preview">
+        <img id="imgPreview" alt="Preview"/>
+      </div>
+
+      <div class="buttons">
+        <button id="cropBtn" disabled>Crop Leaf</button>
+        <button id="predictBtn" disabled>Predict</button>
+      </div>
+
+      <div class="preview2">
+        <div class="mini-title">Cropped leaf:</div>
+        <img id="croppedPreview" alt="Cropped preview"/>
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div class="result">
+        <div><span class="label">Prediction:</span> <span id="pred">—</span></div>
+        <div><span class="label">Confidence:</span> <span id="conf">—</span></div>
+
+        <!-- ✅ Optional: Top-5 -->
+        <div id="topkWrap" class="topk" style="display:none;">
+          <div class="mini-title">Top guesses:</div>
+          <ul id="topkList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>Backend: <code>http://localhost:5000</code></footer>
+  </div>
+
+  <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
