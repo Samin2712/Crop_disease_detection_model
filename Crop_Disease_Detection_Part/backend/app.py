@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from skimage.feature import hog
 import uvicorn
 
+from leaf_filter import detect_and_crop_leaf  # NEW
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "models_out")
 
@@ -18,6 +20,7 @@ CROP_MODELS = {
     "tomato": os.path.join(MODEL_DIR, "tomato_model.pkl"),
 }
 
+LEAF_GATE_PATH = os.path.join(MODEL_DIR, "leaf_gate.pkl")  # optional
 _loaded = {}
 
 def softmax(x: np.ndarray) -> np.ndarray:
@@ -60,6 +63,49 @@ def load_bundle(crop: str):
     _loaded[crop] = bundle
     return bundle
 
+def load_leaf_gate():
+    if "leaf_gate" in _loaded:
+        return _loaded["leaf_gate"]
+
+    if not os.path.exists(LEAF_GATE_PATH):
+        _loaded["leaf_gate"] = None
+        return None
+
+    gate = joblib.load(LEAF_GATE_PATH)
+    _loaded["leaf_gate"] = gate
+    return gate
+
+def leaf_gate_check(img_bgr: np.ndarray) -> dict:
+    """
+    1) Fast OpenCV rule-based leaf detection + crop (always used)
+    2) Optional ML leaf/not-leaf gate if models_out/leaf_gate.pkl exists
+    """
+    ok, crop, info = detect_and_crop_leaf(img_bgr)
+    if not ok:
+        return {"ok": False, "reason": info.get("reason", "Not a leaf image."), "info": info}
+
+    # Optional ML gate
+    gate = load_leaf_gate()
+    if gate is not None:
+        size = tuple(gate.get("img_size", (96, 96)))
+        X = extract_features(crop, size=size).reshape(1, -1)
+        scaler = gate.get("scaler", None)
+        if scaler is not None:
+            X = scaler.transform(X)
+
+        model = gate["model"]
+        pred = int(model.predict(X)[0])
+        if pred != 1:  # 1 == leaf
+            return {"ok": False, "reason": "ML gate: not a leaf image.", "info": info}
+
+        # confidence if available
+        conf = None
+        if hasattr(model, "predict_proba"):
+            conf = float(model.predict_proba(X)[0][1])
+        return {"ok": True, "img": crop, "info": info, "ml_confidence": conf}
+
+    return {"ok": True, "img": crop, "info": info, "ml_confidence": None}
+
 def predict_image_bytes(crop: str, image_bytes: bytes) -> dict:
     b = load_bundle(crop)
     model = b["model"]
@@ -74,7 +120,17 @@ def predict_image_bytes(crop: str, image_bytes: bytes) -> dict:
     if img is None:
         raise ValueError("Invalid image uploaded.")
 
-    X = extract_features(img, size=img_size).reshape(1, -1)
+    # ✅ Leaf-only gate + crop
+    gate_res = leaf_gate_check(img)
+    if not gate_res["ok"]:
+        return {
+            "error": "Please upload a clear leaf photo only.",
+            "details": gate_res,
+        }
+
+    leaf_img = gate_res["img"]
+
+    X = extract_features(leaf_img, size=img_size).reshape(1, -1)
 
     if scaler is not None and model_name != "RandomForest":
         X = scaler.transform(X)
@@ -104,9 +160,13 @@ def predict_image_bytes(crop: str, image_bytes: bytes) -> dict:
         "prediction": pred_label,
         "confidence": conf,
         "topk": topk,
+        "leaf_gate": {
+            "opencv_info": gate_res.get("info"),
+            "ml_confidence": gate_res.get("ml_confidence"),
+        },
     }
 
-app = FastAPI(title="Multi-crop Disease Detection API")
+app = FastAPI(title="Multi-crop Disease Detection API (Leaf-only)")
 
 app.add_middleware(
     CORSMiddleware,
@@ -118,7 +178,11 @@ app.add_middleware(
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "supported_crops": list(CROP_MODELS.keys())}
+    return {
+        "status": "ok",
+        "supported_crops": list(CROP_MODELS.keys()),
+        "leaf_gate_model_loaded": os.path.exists(LEAF_GATE_PATH),
+    }
 
 @app.post("/predict")
 async def predict(crop: str = Form(...), image: UploadFile = File(...)):
