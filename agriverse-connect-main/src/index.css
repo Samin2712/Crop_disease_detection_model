@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* AgriVerse Design System - Green & Earth Tones */
+
+@layer base {
+  :root {
+    /* Light mode - Cream/Beige backgrounds with forest greens */
+    --background: 45 30% 97%;
+    --foreground: 150 30% 15%;
+
+    --card: 45 25% 95%;
+    --card-foreground: 150 30% 15%;
+
+    --popover: 45 25% 95%;
+    --popover-foreground: 150 30% 15%;
+
+    /* Primary - Forest Green */
+    --primary: 142 45% 28%;
+    --primary-foreground: 45 30% 97%;
+
+    /* Secondary - Warm Brown/Tan */
+    --secondary: 35 35% 85%;
+    --secondary-foreground: 150 30% 15%;
+
+    --muted: 45 20% 92%;
+    --muted-foreground: 150 15% 45%;
+
+    /* Accent - Earthy Olive */
+    --accent: 85 25% 45%;
+    --accent-foreground: 45 30% 97%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 45 20% 85%;
+    --input: 45 20% 85%;
+    --ring: 142 45% 28%;
+
+    --radius: 0.625rem;
+
+    /* Success - Bright Green */
+    --success: 142 70% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning - Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --sidebar-background: 45 25% 95%;
+    --sidebar-foreground: 150 30% 15%;
+    --sidebar-primary: 142 45% 28%;
+    --sidebar-primary-foreground: 45 30% 97%;
+    --sidebar-accent: 85 25% 45%;
+    --sidebar-accent-foreground: 45 30% 97%;
+    --sidebar-border: 45 20% 85%;
+    --sidebar-ring: 142 45% 28%;
+  }
+
+  .dark {
+    /* Dark mode - Deep forest backgrounds */
+    --background: 150 30% 8%;
+    --foreground: 45 25% 92%;
+
+    --card: 150 25% 12%;
+    --card-foreground: 45 25% 92%;
+
+    --popover: 150 25% 12%;
+    --popover-foreground: 45 25% 92%;
+
+    /* Primary - Lighter green for dark mode */
+    --primary: 142 50% 45%;
+    --primary-foreground: 150 30% 8%;
+
+    /* Secondary - Muted brown */
+    --secondary: 35 20% 20%;
+    --secondary-foreground: 45 25% 92%;
+
+    --muted: 150 20% 18%;
+    --muted-foreground: 45 15% 65%;
+
+    /* Accent - Sage green */
+    --accent: 85 30% 35%;
+    --accent-foreground: 45 25% 92%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 150 20% 18%;
+    --input: 150 20% 18%;
+    --ring: 142 50% 45%;
+
+    /* Success */
+    --success: 142 60% 40%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning */
+    --warning: 38 80% 45%;
+    --warning-foreground: 0 0% 100%;
+
+    --sidebar-background: 150 25% 10%;
+    --sidebar-foreground: 45 25% 92%;
+    --sidebar-primary: 142 50% 45%;
+    --sidebar-primary-foreground: 150 30% 8%;
+    --sidebar-accent: 85 30% 35%;
+    --sidebar-accent-foreground: 45 25% 92%;
+    --sidebar-border: 150 20% 18%;
+    --sidebar-ring: 142 50% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
