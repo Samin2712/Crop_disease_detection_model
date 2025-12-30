@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriVerse • Plant Disease Detection</title>
+    <link rel="stylesheet" href="./styles.css" />
+
+    <!-- Cropper.js -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css"
+    />
+  </head>
+
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="brand">
+          <div class="brand-badge" aria-hidden="true">🌿</div>
+          <div class="brand-text">
+            <h1 class="title">Plant Disease Detection</h1>
+            <p class="subtitle">Select crop → Upload → Crop leaf → Predict</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="card" aria-label="Disease detection">
+          <div class="form-grid">
+            <!-- Crop -->
+            <div class="field">
+              <label class="label" for="cropSelect">Select Crop</label>
+              <select id="cropSelect" class="select">
+                <option value="rice">Rice</option>
+                <option value="jute">Jute</option>
+                <option value="potato">Potato</option>
+                <option value="tomato">Tomato</option>
+              </select>
+              <p class="help">Choose the crop model before prediction.</p>
+            </div>
+
+            <!-- Upload -->
+            <div class="field">
+              <label class="label" for="file">Upload Leaf Image</label>
+              <input id="file" class="file" type="file" accept="image/*" />
+              <p class="help">Use a clear photo of a single leaf if possible.</p>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">Preview</div>
+              <div class="panel-sub">Drag to adjust crop area.</div>
+            </div>
+            <div class="preview">
+              <img id="imgPreview" alt="Image preview" />
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="actions">
+            <button id="cropBtn" class="btn" disabled type="button">
+              Crop Leaf
+            </button>
+            <button id="predictBtn" class="btn btn-primary" disabled type="button">
+              Predict
+            </button>
+          </div>
+
+          <!-- Cropped -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">Cropped Leaf</div>
+              <div class="panel-sub">This is what will be sent to the model.</div>
+            </div>
+            <div class="cropped">
+              <img id="croppedPreview" alt="Cropped preview" />
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div id="status" class="status" role="status" aria-live="polite"></div>
+
+          <!-- Result -->
+          <div class="result">
+            <div class="result-row">
+              <span class="result-label">Prediction</span>
+              <span id="pred" class="result-value">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Confidence</span>
+              <span id="conf" class="result-value">—</span>
+            </div>
+
+            <div id="topkWrap" class="topk" style="display: none">
+              <div class="topk-title">Top guesses</div>
+              <ul id="topkList" class="topk-list"></ul>
+            </div>
+          </div>
+
+          <!-- n8n Advice (shown after prediction) -->
+          <div id="adviceSection" class="panel" style="display: none">
+            <div class="panel-head">
+              <div class="panel-title">ফসলের রোগ পরামর্শ (AI)</div>
+              <div class="panel-sub">
+                ফসল: <strong id="adviceCrop">—</strong> · রোগ: <strong id="adviceDisease">—</strong>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button id="adviceBtn" class="btn btn-primary" type="button" disabled>
+                পরামর্শ দেখুন
+              </button>
+              <span id="adviceStatus" class="status-inline" aria-live="polite"></span>
+            </div>
+
+            <pre id="adviceOut" class="advice-out">—</pre>
+          </div>
+
+          <footer class="footnote">
+            Backend: <code class="code">http://localhost:5000</code>
+          </footer>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
